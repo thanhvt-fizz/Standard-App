@@ -11,6 +11,9 @@ enum class ItemType { TYPE_A, TYPE_B }
 
 sealed class FirstListViewUiState {
     object Loading : FirstListViewUiState()
-    data class Success(val items: List<FirstItem>) : FirstListViewUiState()
+    data class Success(
+        val items: List<FirstItem>,
+        val searchQuery: String = ""
+    ) : FirstListViewUiState()
     data class Error(val message: String) : FirstListViewUiState()
 }
