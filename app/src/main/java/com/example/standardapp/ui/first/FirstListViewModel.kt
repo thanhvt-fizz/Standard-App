@@ -25,12 +25,10 @@ import javax.inject.Inject
 class FirstListViewModel @Inject constructor(
     private val repository: FirstMockRepository
 ) : ViewModel() {
-    private val sourceState = MutableStateFlow<FirstListViewUiState>(FirstListViewUiState.Loading)
+    private val _sourceState = MutableStateFlow<FirstListViewUiState>(FirstListViewUiState.Loading)
     private val _searchQuery = MutableStateFlow("")
-
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
     val state: StateFlow<FirstListViewUiState> =
-        combine(sourceState, searchQuery) { state, query ->
+        combine(_sourceState, _searchQuery) { state, query ->
             state to query.trim()
         }.transformLatest { (state, query) ->
             when {
@@ -66,12 +64,12 @@ class FirstListViewModel @Inject constructor(
 
     fun load() {
         viewModelScope.launch {
-            sourceState.value = FirstListViewUiState.Loading
+            _sourceState.value = FirstListViewUiState.Loading
             try {
                 val repositories = repository.loadItems()
-                sourceState.value = FirstListViewUiState.Success(repositories)
+                _sourceState.value = FirstListViewUiState.Success(repositories)
             } catch (e: Exception) {
-                sourceState.value = FirstListViewUiState.Error(e.localizedMessage ?: "Unknown")
+                _sourceState.value = FirstListViewUiState.Error(e.localizedMessage ?: "Unknown")
             }
         }
     }
